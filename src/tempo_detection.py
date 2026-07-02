@@ -3,8 +3,33 @@ import os
 import time
 import math
 import pyaudio
+import wave
 
 audio_path = "src\Audio_Files\\"
+CHUNK = 512
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 44100
+
+def record_audio():
+    stop_recording = False
+    p = pyaudio.PyAudio()
+    input("Press Enter to Begin Recording: ")
+    try:
+        stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True)
+        input("Recording in Progress, Press Ctrl+C to Stop:")
+        frames = []
+        while not stop_recording:
+            try:
+                data = p.read(CHUNK)
+                frames.add(data)
+            except IOError as e:
+                print(f"overload Error")
+                continue
+    except IOError:
+        print("Recording Failed")
+        frames = []
+    
 
 
 
