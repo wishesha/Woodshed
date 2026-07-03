@@ -2,35 +2,36 @@ import librosa
 import os
 import time
 import math
-import wave
+import threading
+import sounddevice as sd
+import numpy as nm 
 
 audio_path = "src\Audio_Files\\"
-CHUNK = 512
-FORMAT = pyaudio.paInt16
+FORMAT = 'int16'
 CHANNELS = 1
 RATE = 44100
 
+def wait_for_stop(stop_event):
+    input("Recording in Progress, Press Enter to Stop:")
+    stop_event.set()
+
 def record_audio():
-    stop_recording = False
-    p = pyaudio.PyAudio()
+    frames = []
+    stop_event = threading.Event()
+
+    def my_callback(indata, frame_count, time_info, status):
+        frames.append(indata.copy())
+
     input("Press Enter to Begin Recording: ")
     try:
-        stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True)
-        input("Recording in Progress, Press Ctrl+C to Stop:")
-        frames = []
-        while not stop_recording:
-            try:
-                data = p.read(CHUNK)
-                frames.add(data)
-            except IOError as e:
-                print(f"overload Error")
-                continue
+        with sd.InputStream(samplerate=RATE, channels=CHANNELS, dtype=FORMAT, callback=my_callback):
+            
+            threading.Thread(target=wait_for_stop, args=(stop_event,)).start()
+            while not stop_event.is_set():
+                time.sleep(0.1)
     except IOError:
         print("Recording Failed")
         frames = []
-    
-
-
 
 def detect_tempo(audio_path):
     file = input("Enter Filename('.wav' only): ")
@@ -65,8 +66,9 @@ def detect_tempo(audio_path):
     print(f"Estimated Tempo: {tempo}\nBeats: {len(beat_times)}")
     return tempo
 
-def main():    
-    detect_tempo(audio_path)
+def main():
+    record_audio()
+#    detect_tempo(audio_path)
 
 if __name__ == "__main__":  
     main()
