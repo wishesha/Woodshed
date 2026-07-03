@@ -3,8 +3,9 @@ import os
 import time
 import math
 import threading
+from datetime import datetime
 import sounddevice as sd
-import numpy as nm 
+import numpy as np 
 
 audio_path = "src\Audio_Files\\"
 FORMAT = 'int16'
@@ -19,11 +20,14 @@ def record_audio():
     frames = []
     stop_event = threading.Event()
 
+    song_name = input("Name of Passage: ")
+
     def my_callback(indata, frame_count, time_info, status):
         frames.append(indata.copy())
 
     input("Press Enter to Begin Recording: ")
     try:
+        print("Recording...")
         with sd.InputStream(samplerate=RATE, channels=CHANNELS, dtype=FORMAT, callback=my_callback):
             
             threading.Thread(target=wait_for_stop, args=(stop_event,)).start()
@@ -32,6 +36,12 @@ def record_audio():
     except IOError:
         print("Recording Failed")
         frames = []
+
+    audio_data = np.concatenate(frames, axis=0)
+    timestamp = datetime.now()
+    formatted_time = timestamp.strftime("%Y-%m-%d_%H:%M")
+    print(formatted_time)
+    
 
 def detect_tempo(audio_path):
     file = input("Enter Filename('.wav' only): ")
