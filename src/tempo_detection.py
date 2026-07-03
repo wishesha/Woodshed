@@ -2,7 +2,6 @@ import librosa
 import os
 import time
 import math
-import pyaudio
 import wave
 
 audio_path = "src\Audio_Files\\"
