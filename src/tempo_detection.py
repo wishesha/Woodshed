@@ -5,6 +5,7 @@ import math
 import threading
 from datetime import datetime
 import sounddevice as sd
+import soundfile as sf
 import numpy as np 
 
 audio_path = "src\Audio_Files\\"
@@ -19,9 +20,7 @@ def wait_for_stop(stop_event):
 def record_audio():
     frames = []
     stop_event = threading.Event()
-
-    song_name = input("Name of Passage: ")
-
+    song_name = input("Name of Passage (Format: NameOfPassage): ")
     def my_callback(indata, frame_count, time_info, status):
         frames.append(indata.copy())
 
@@ -36,16 +35,22 @@ def record_audio():
     except IOError:
         print("Recording Failed")
         frames = []
-
     audio_data = np.concatenate(frames, axis=0)
     timestamp = datetime.now()
     formatted_time = timestamp.strftime("%Y-%m-%d_%H:%M")
-    print(formatted_time)
-    
+    filename = f"{song_name}_{formatted_time}.wav"
+
+    directory = input("Enter Directory to Save File: ")
+    os.makedirs(directory, exist_ok=True)
+    filepath = os.path.join(directory, filename)
+    sf.write(filepath, audio_data, RATE)
+    print(f"saved recording as {filepath}")
+    return filepath
+
+
+        
 
 def detect_tempo(audio_path):
-    file = input("Enter Filename('.wav' only): ")
-    audio_path += file
     try:
         file_size = os.path.getsize(audio_path)
         if file_size < 1000000:
@@ -55,15 +60,15 @@ def detect_tempo(audio_path):
             file_size = file_size/1000000
             byte_type = "MB"
         start_time = time.perf_counter()
-        print(f"Detected file: {file} of size {file_size} {byte_type}")
+        print(f"Detected file: {audio_path} of size {file_size} {byte_type}")
         y, sr = librosa.load(audio_path)
         if y.size == 0:
             raise ValueError("Audio file contains no data.")
     except OSError:
-        print(f"{file} is not a valid file")
+        print(f"{audio_path} is not a valid file")
         raise SystemExit
     except Exception as e:
-            print(f"Failed to load {file} \nError: {type(e).__name__} -- {e}")
+            print(f"Failed to load {audio_path} \nError: {type(e).__name__} -- {e}")
             raise SystemExit
     
     
