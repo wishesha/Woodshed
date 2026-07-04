@@ -44,11 +44,8 @@ def record_audio():
     os.makedirs(directory, exist_ok=True)
     filepath = os.path.join(directory, filename)
     sf.write(filepath, audio_data, RATE)
-    print(f"saved recording as {filepath}")
+    print(f"Saved Recording as {filepath}")
     return filepath
-
-
-        
 
 def detect_tempo(audio_path):
     try:
@@ -60,7 +57,7 @@ def detect_tempo(audio_path):
             file_size = file_size/1000000
             byte_type = "MB"
         start_time = time.perf_counter()
-        print(f"Detected file: {audio_path} of size {file_size} {byte_type}")
+        print(f"\nDetected file: {audio_path} of size {file_size} {byte_type}")
         y, sr = librosa.load(audio_path)
         if y.size == 0:
             raise ValueError("Audio file contains no data.")
@@ -77,13 +74,13 @@ def detect_tempo(audio_path):
     end_time = time.perf_counter()
     compute_time = math.trunc((end_time - start_time) * 100) / 100
     
-    print(f"time to complete: {compute_time} seconds")
+    print(f"Time to Complete: {compute_time} seconds")
     print(f"Estimated Tempo: {tempo}\nBeats: {len(beat_times)}")
     return tempo
 
 def main():
-    record_audio()
-#    detect_tempo(audio_path)
+    audio_path = record_audio()
+    detect_tempo(audio_path)
 
 if __name__ == "__main__":  
     main()
