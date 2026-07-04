@@ -35,7 +35,7 @@ def record_audio():
     except IOError:
         print("Recording Failed")
         frames = []
-    audio_data = np.concatenate(frames, axis=0)
+    audio_data = np.concatenate(frames)
     timestamp = datetime.now()
     formatted_time = timestamp.strftime("%Y-%m-%d_%H:%M")
     filename = f"{song_name}_{formatted_time}.wav"
