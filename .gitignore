@@ -4,3 +4,9 @@ woodshed-env/
 # Recording Audio
 recordings/
 
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.env
