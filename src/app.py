@@ -4,6 +4,7 @@ import time
 import math
 from datetime import datetime
 import streamlit as st
+import psycopg2
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
@@ -11,8 +12,19 @@ import soundfile as sf
 from audio_recorder_streamlit import audio_recorder
 
 # File Paths
+DATABASE_URL = os.getenv("AZURE_POSTGRESQL_CONNECTIONSTRING")
 AUDIO_DIR = os.path.join("src", "Audio_Files")
 METADATA_FILE = os.path.join(AUDIO_DIR, "metadata.json")
+
+if not DATABASE_URL:
+    st.error("DB connection string not found")
+
+@st.cache_resource
+def get_db_connection():
+    conn = psycopg2.connect(DATABASE_URL)
+    return conn
+
+
 
 os.makedirs(AUDIO_DIR, exist_ok=True)
 
